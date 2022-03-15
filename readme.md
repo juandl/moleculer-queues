@@ -13,13 +13,13 @@ The main idea of this package is to allow it to support multiple types of "queue
 Install my-project with npm
 
 ```bash
-npm install moleculer-bull --save
+npm install moleculer-queues --save
 ```
 
 or
 
 ```bash
-yarn add moleculer-bull
+yarn add moleculer-queues
 ```
 
 ## Usage/Examples
