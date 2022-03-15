@@ -32,5 +32,16 @@
     "lint-staged": "^12.3.5",
     "npm-check": "^5.9.2",
     "prettier": "^2.5.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juandl/moleculer-queues.git"
+  },
+  "contributors": [
+    "Juan David <juand.business@gmail.com/>"
+  ],
+  "bugs": {
+    "url": "https://github.com/juandl/moleculer-queues/issues"
+  },
+  "homepage": "https://github.com/juandl/moleculer-queues#readme"
 }
