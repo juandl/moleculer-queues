@@ -1,0 +1,174 @@
+'use strict';
+
+const Bull = require('bull');
+const _ = require('lodash');
+
+//Constants
+const QueueOps = require('./constants/queues');
+
+/**
+ *
+ * @param {String} prefixJob - Prefix for all queue keys.
+ * @param {import('@types/bull').QueueOptions} opts
+ */
+module.exports = function createService(prefixJob, opts = QueueOps) {
+  /**
+   * Task queue mixin service using bull
+   *
+   * @name moleculer-queues
+   * @module Service
+   */
+  return {
+    name: 'moleculerQueues',
+    /**
+     * Methods
+     */
+    methods: {
+      /**
+       * Get instance queue
+       *
+       * @param {String} name
+       * @returns {Object}
+       */
+      getJobQueue(name) {
+        let entity;
+
+        //Search for the job process
+        entity = _.get(this.$queues, (q) => q.name === name, null);
+
+        return entity;
+      },
+      /**
+       * Create a new job
+       *
+       * @param {String} name
+       * @param {any} payload
+       * @param {import('@types/bull').JobOptions} opts - Bull job options
+       * @returns {import('@types/bull').Job}
+       */
+      addJobQueue(name, payload, opts) {
+        let entity;
+
+        entity = this.getJobQueue(name);
+
+        if (!entity) return;
+
+        return entity.Queue.add(payload, opts);
+      },
+
+      /**
+       * Get a queue by name
+       *
+       * @param {Object} params
+       * @param {String} params.name
+       * @param {Promise} params.handler
+       * @returns {Queue}
+       */
+      getQueue(params) {
+        /**
+         * Create task
+         * @type {Array.<{name: String, handler: function, Queue:Object}
+         */
+        let entity;
+
+        //Search for the job process
+        entity = this.getJobQueue(params.name);
+
+        //Create a new queue
+        if (!entity) {
+          //Assign params
+          entity = {
+            ...params,
+          };
+
+          try {
+            /**
+             * Create Bull instance
+             */
+            entity.Queue = new Bull(params.name, {
+              prefix: `molecQueues:${prefixJob}`, //Keep default using prefixJob
+              ...opts,
+            });
+          } catch (err) {
+            throw new Error(`moleculerQueues: Task can't start ${params.name}`);
+          }
+
+          //Push task to exists queues
+          this.$queues.push(entity);
+        }
+
+        //return found entity
+        return entity.Queue;
+      },
+    },
+
+    /**
+     * Service created lifecycle event handler
+     */
+    created() {
+      /**
+       * Create locally array of queues
+       * @type {Array.<{name: String, handler: Promise, Queue: Object}>}
+       */
+      this.$queues = [];
+    },
+
+    /**
+     * Service started lifecycle event handler
+     */
+    started() {
+      const { queues } = this.schema;
+
+      /**
+       * Validate: Make sure prefix-job is defined
+       */
+      if (!prefixJob) {
+        throw new Error('moleculerQueues required a prefix name');
+      }
+
+      /**
+       * Validate: Make sure prefix-job is defined
+       */
+      if (!opts.redis) {
+        throw new Error('moleculerQueues required redis to work');
+      }
+
+      if (queues && Array.isArray(queues)) {
+        /**
+         * Go through each 'queues' and create a new Queue with a process
+         */
+        _.forEach(this.queues, (entity) => {
+          let queue; // instance
+
+          //If queue does't have any of this continue with next
+          if (!entity.name) return;
+          if (!entity.handler) return;
+
+          //Search for a Queue if does't exist create new one
+          queue = this.getQueue(entity);
+
+          //Bind the handler and process job
+          queue.process(entity.handler.bind(this));
+        });
+      }
+
+      return this.Promise.resolve();
+    },
+    /**
+     * Service stop lifecycle event handler
+     */
+    stopped() {
+      /**
+       * Go through each 'queues' and stop each one
+       */
+      _.forEach(this.queues, (entity) => {
+        //Clean all the jobs
+        entity.Queue.obliterate({ force: true }).then(() => {
+          console.log(`Done removing job ${entity.name}`);
+        });
+      });
+
+      return this.Promise.resolve();
+    },
+  };
+};
