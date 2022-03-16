@@ -34,7 +34,7 @@ module.exports = function createService(prefixJob, opts = QueueOps) {
         let entity;
 
         //Search for the job process
-        entity = _.get(this.$queues, (q) => q.name === name, null);
+        entity = _.find(this.$queues, (q) => q.name === name, null);
 
         return entity;
       },
@@ -137,7 +137,7 @@ module.exports = function createService(prefixJob, opts = QueueOps) {
         /**
          * Go through each 'queues' and create a new Queue with a process
          */
-        _.forEach(this.queues, (entity) => {
+        _.forEach(queues, (entity) => {
           let queue; // instance
 
           //If queue does't have any of this continue with next
