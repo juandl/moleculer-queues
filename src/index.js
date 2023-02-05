@@ -1,6 +1,7 @@
 'use strict';
 
 const Bull = require('bull');
+const kleur = require('kleur');
 const _ = require('lodash');
 
 //Constants
@@ -89,6 +90,20 @@ module.exports = function createService(prefixJob, opts = QueueOps) {
               prefix: `molecQueues:${prefixJob}`, //Keep default using prefixJob
               ...opts,
             });
+
+            /**
+             * Check for error connections on client
+             */
+            entity.Queue.client.on('error', (error) =>
+              this.logger.info(
+                kleur
+                  .bgRed()
+                  .white(
+                    `moleculer-queues|Redis: ${params.name} Error Connection`
+                  ),
+                error
+              )
+            );
           } catch (err) {
             throw new Error(`moleculerQueues: Task can't start ${params.name}`);
           }
