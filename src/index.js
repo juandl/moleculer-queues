@@ -9,10 +9,15 @@ const QueueOps = require('./constants/queues');
 
 /**
  *
- * @param {String} prefixJob - Prefix for all queue keys.
+ * @param {String} JobId - Name of the job
+ * @param {String} jobPrefix - Name of the prefix for each task
  * @param {import('@types/bull').QueueOptions} opts
  */
-module.exports = function createService(prefixJob, opts = QueueOps) {
+module.exports = function createService(
+  jobName = 'molecQueues',
+  jobPrefix,
+  opts = QueueOps
+) {
   /**
    * Task queue mixin service using bull
    *
@@ -87,7 +92,7 @@ module.exports = function createService(prefixJob, opts = QueueOps) {
              * Create Bull instance
              */
             entity.Queue = new Bull(params.name, {
-              prefix: `molecQueues:${prefixJob}`, //Keep default using prefixJob
+              prefix: `${jobName}:${jobPrefix}`, //Keep default using jobPrefix
               ...opts,
             });
 
@@ -137,7 +142,7 @@ module.exports = function createService(prefixJob, opts = QueueOps) {
       /**
        * Validate: Make sure prefix-job is defined
        */
-      if (!prefixJob) {
+      if (!jobPrefix) {
         throw new Error('moleculerQueues required a prefix name');
       }
 
