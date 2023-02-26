@@ -53,13 +53,19 @@ module.exports = function createService(
        * @returns {import('@types/bull').Job}
        */
       addJobQueue(name, payload, opts) {
-        let entity;
+        /**
+         * Default options
+         */
+        const options = _.defaultsDeep(opts, {
+          removeOnComplete: true,
+        });
 
-        entity = this.getJobQueue(name);
+        //Get job
+        const entity = this.getJobQueue(name);
 
         if (!entity) return;
 
-        return entity.Queue.add(payload, opts);
+        return entity.Queue.add(payload, options);
       },
 
       /**
