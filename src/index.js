@@ -58,6 +58,7 @@ module.exports = function createService(
          */
         const options = _.defaultsDeep(opts, {
           removeOnComplete: true,
+          removeOnFail: true,
         });
 
         //Get job
