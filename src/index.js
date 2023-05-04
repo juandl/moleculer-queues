@@ -98,10 +98,10 @@ module.exports = function createService(
             /**
              * Create Bull instance
              */
-            entity.Queue = new Bull(params.name, {
+            entity.Queue = new Bull(params.name, opts.redis, _.omit({
               prefix: `${jobName}:${jobPrefix}`, //Keep default using jobPrefix
               ...opts,
-            });
+            }, ["redis"]));
 
             /**
              * Check for error connections on client
