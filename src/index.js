@@ -188,14 +188,13 @@ module.exports = function createService(
       /**
        * Go through each 'queues' and stop each one
        */
-      _.forEach(this.queues, (entity) => {
+      _.forEach(this.$queues, (entity) => {
         //Clean all the jobs
         entity.Queue.obliterate({ force: true }).then(() => {
-          console.log(`Done removing job ${entity.name}`);
+          console.log(`Removing job ${entity.name}`);
         });
       });
-
-      return this.Promise.resolve();
+    
     },
   };
 };
