@@ -1,6 +1,6 @@
 {
   "name": "moleculer-queues",
-  "version": "0.0.9",
+  "version": "0.0.11",
   "description": "Task queue mixin using bull",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
   "author": "juandl",
   "license": "MIT",
   "dependencies": {
-    "bull": "^4.10.4",
+    "bull": "^4.12.4",
     "lodash": "^4.17.21"
   },
   "peerDependencies": {

@@ -98,10 +98,17 @@ module.exports = function createService(
             /**
              * Create Bull instance
              */
-            entity.Queue = new Bull(params.name, opts.redis, _.omit({
-              prefix: `${jobName}:${jobPrefix}`, //Keep default using jobPrefix
-              ...opts,
-            }, ["redis"]));
+            entity.Queue = new Bull(
+              params.name,
+              opts.redis,
+              _.omit(
+                {
+                  prefix: `${jobName}:${jobPrefix}`, //Keep default using jobPrefix
+                  ...opts,
+                },
+                ['redis']
+              )
+            );
 
             /**
              * Check for error connections on client
@@ -190,11 +197,10 @@ module.exports = function createService(
        */
       _.forEach(this.$queues, (entity) => {
         //Clean all the jobs
-        entity.Queue.obliterate({ force: true }).then(() => {
+        entity.Queue.obliterate().then(() => {
           console.log(`Removing job ${entity.name}`);
         });
       });
-    
     },
   };
 };
