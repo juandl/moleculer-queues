@@ -1,6 +1,6 @@
 {
   "name": "moleculer-queues",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Task queue mixin using bull",
   "main": "index.js",
   "scripts": {
